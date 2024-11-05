@@ -131,11 +131,12 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
+    void OnTriggerEnter2D(Collider2D other)
     {
-        if (collision.gameObject.CompareTag("Coin"))
+        if (other.CompareTag("Coin"))
         {
-            Destroy(collision.gameObject);
+            Debug.Log("hihihi");
+            Destroy(other.gameObject);
             GameSystem.GetComponent<GameSystem>().addCoin(1);
         }
     }

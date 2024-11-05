@@ -8,14 +8,13 @@ public class GameSystem : MonoBehaviour
 
     void Awake()
     {
-        // If there is already an instance of this object, destroy the new one
+        
         if (instance != null && instance != this)
         {
             Destroy(gameObject);
             return;
         }
 
-        // Set the instance to this object and mark it to not be destroyed
         instance = this;
         DontDestroyOnLoad(gameObject);
     }
@@ -40,6 +39,5 @@ public class GameSystem : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(coins);
     }
 }
