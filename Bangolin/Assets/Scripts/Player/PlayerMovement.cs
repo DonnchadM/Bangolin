@@ -139,6 +139,10 @@ public class PlayerMovement : MonoBehaviour
             Destroy(other.gameObject);
             GameSystem.GetComponent<GameSystem>().addCoin(1);
         }
+        else if (other.CompareTag("Star")){
+            Debug.Log("Star");
+            GameSystem.GetComponent<GameSystem>().beatLevel();
+        }
     }
     private void OnDrawGizmos()
     {
