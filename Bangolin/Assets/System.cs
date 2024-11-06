@@ -25,6 +25,8 @@ public class GameSystem : MonoBehaviour
 
         instance = this;
         DontDestroyOnLoad(gameObject);
+        canvas = GameObject.Find("Canvas");
+        coinText = GameObject.Find("coins");
     }
 
     public int getCoins()
@@ -101,12 +103,11 @@ public class GameSystem : MonoBehaviour
     void Start()
     {
         sceneChanging = GetComponent<SceneChanger>();
-        canvas = GameObject.Find("Canvas");
-        coinText = GameObject.Find("coins");
     }
 
     // Update is called once per frame
     void Update()
     {
+        //coinText.GetComponent<TMP_Text>().text = coins.ToString();
     }
 }
