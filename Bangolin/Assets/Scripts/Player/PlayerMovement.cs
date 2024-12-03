@@ -27,12 +27,11 @@ public class PlayerMovement : MonoBehaviour
     private bool isGrounded;
     private float moveInput;
     private float currentSpeed = 0f;
-
     public float rayLength = 0.2f;
 
     private GameObject GameSystem;
     private GameSystem systemScript;
-
+    private playerHealth healthScript;
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -41,6 +40,7 @@ public class PlayerMovement : MonoBehaviour
         animator = GetComponent<Animator>();
         GameSystem = GameObject.Find("GameSystem");
         systemScript = GameSystem.GetComponent<GameSystem>();
+        healthScript = this.gameObject.GetComponent<playerHealth>();
     }
 
     void Update()
@@ -96,9 +96,13 @@ public class PlayerMovement : MonoBehaviour
             transform.localScale = new Vector3(-1, 1, 1);
         }
         if (Input.GetKeyDown("z")){
-            if(systemScript.getPowerUpQuantity("Zoom") >= 1){
-                Zoom();
-            }
+            powerUpSelect(0);
+        }
+        else if(Input.GetKeyDown("x")){
+            powerUpSelect(1);
+        }
+        else if(Input.GetKeyDown("c")){
+            powerUpSelect(2);
         }
         
     }
@@ -157,7 +161,21 @@ public class PlayerMovement : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawLine(transform.position, transform.position + Vector3.down * rayLength);
     }
-
+    private void powerUpSelect(int option){
+        string powerFound = systemScript.getPowerPos(option);
+        int quan = systemScript.getPowerUpQuantity(powerFound);
+        if (quan >= 1){
+            switch (powerFound){
+                case "Zoom":
+                    Zoom();
+                    break;
+                case "'NotherShell":
+                    healthScript.addHit(1);
+                    Debug.Log("firstShellTest");
+                    break;
+            }
+        }
+    }
     private void Zoom(){
         rb.velocity = new Vector2(rb.velocity.x, 12);
         systemScript.usePowerUp("Zoom");

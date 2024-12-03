@@ -13,7 +13,7 @@ public class playerHealth : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        hits = 2;
+        hits = 1;
     }
     public void addHit(int newHits){
         if (hits + newHits <= maximumHits){

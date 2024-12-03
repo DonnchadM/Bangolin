@@ -35,7 +35,28 @@ public class GameSystem : MonoBehaviour
         coinText.GetComponent<TMP_Text>().text = coins.ToString();
 
     }
+    public string getPowerPos(int pos)
+    {
+        // Check if the position is valid
+        if (pos < 0 || pos >= powerUpInventory.Count)
+        {
+            Debug.LogWarning("Position out of range in powerUpInventory.");
+            return null; // Return null or handle this error appropriately
+        }
 
+        // Iterate through the dictionary keys
+        int currentIndex = 0;
+        foreach (var key in powerUpInventory.Keys)
+        {
+            if (currentIndex == pos)
+            {
+                return key; // Return the power-up name at the specified position
+            }
+            currentIndex++;
+        }
+
+        return null; // Fallback, should not be reached if input is valid
+    }
     public void addCoin(int coinsAdd)
     {
         coins += coinsAdd;
@@ -79,12 +100,20 @@ public class GameSystem : MonoBehaviour
 
     public int getPowerUpQuantity(string powerUpName)
     {
+        if (string.IsNullOrEmpty(powerUpName))
+        {
+            Debug.LogWarning("Power-up name is null or empty.");
+            return 0;
+        }
+
         if (powerUpInventory.ContainsKey(powerUpName))
         {
             return powerUpInventory[powerUpName];
         }
-        return 0; // Return 0 if the power-up is not in the inventory
+
+        return 0;
     }
+
 
     public bool usePowerUp(string powerUpName)
     {
