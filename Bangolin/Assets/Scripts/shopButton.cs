@@ -23,10 +23,11 @@ public class shopButton : MonoBehaviour
         
     }
 
-    void buy(){
+    public void buy(){
         if (system.getCoins() >= price){
             system.addPowerUp(powerUpName,quantity);
             system.takeCoins(price);
+            Debug.Log("You tried to buy " + quantity + " " + powerUpName + "for £" + price);
         }
     }
 

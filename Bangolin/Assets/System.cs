@@ -44,6 +44,7 @@ public class GameSystem : MonoBehaviour
 
     public void takeCoins(int coinsTake){
         coins -= coinsTake;
+        coinText = GameObject.Find("coins");
         coinText.GetComponent<TMP_Text>().text = coins.ToString();
     }
 
@@ -108,6 +109,12 @@ public class GameSystem : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        #if UNITY_EDITOR
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                UnityEditor.EditorWindow.focusedWindow.maximized = !UnityEditor.EditorWindow.focusedWindow.maximized;
+            }   
+        #endif
         //coinText.GetComponent<TMP_Text>().text = coins.ToString();
     }
 }

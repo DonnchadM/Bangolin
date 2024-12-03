@@ -31,6 +31,7 @@ public class PlayerMovement : MonoBehaviour
     public float rayLength = 0.2f;
 
     private GameObject GameSystem;
+    private GameSystem systemScript;
 
     void Start()
     {
@@ -39,6 +40,7 @@ public class PlayerMovement : MonoBehaviour
         defaultSprite = spriteRenderer.sprite;
         animator = GetComponent<Animator>();
         GameSystem = GameObject.Find("GameSystem");
+        systemScript = GameSystem.GetComponent<GameSystem>();
     }
 
     void Update()
@@ -69,7 +71,7 @@ public class PlayerMovement : MonoBehaviour
         rb.velocity = new Vector2(currentSpeed, rb.velocity.y);
         isGrounded = Physics2D.Raycast(transform.position, Vector2.down, rayLength);
 
-        if (Input.GetKey(KeyCode.Space) && isGrounded)
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
@@ -93,6 +95,12 @@ public class PlayerMovement : MonoBehaviour
         {
             transform.localScale = new Vector3(-1, 1, 1);
         }
+        if (Input.GetKeyDown("z")){
+            if(systemScript.getPowerUpQuantity("Zoom") >= 1){
+                Zoom();
+            }
+        }
+        
     }
 
     private void HandleStateSwitching()
@@ -137,16 +145,21 @@ public class PlayerMovement : MonoBehaviour
         {
             Debug.Log("hihihi");
             Destroy(other.gameObject);
-            GameSystem.GetComponent<GameSystem>().addCoin(1);
+            systemScript.addCoin(1);
         }
         else if (other.CompareTag("Star")){
             Debug.Log("Star");
-            GameSystem.GetComponent<GameSystem>().beatLevel();
+            systemScript.beatLevel();
         }
     }
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawLine(transform.position, transform.position + Vector3.down * rayLength);
+    }
+
+    private void Zoom(){
+        rb.velocity = new Vector2(rb.velocity.x, 12);
+        systemScript.usePowerUp("Zoom");
     }
 }
