@@ -11,9 +11,12 @@ public class GameSystem : MonoBehaviour
     private int levelsBeat = 0;
     private SceneChanger sceneChanging;
     private GameObject canvas;
-    // Dictionary to store power-ups and their quantities
-    private Dictionary<string, int> powerUpInventory = new Dictionary<string, int>();
+    public Dictionary<string, int> powerUpInventory = new Dictionary<string, int>();
+    private List<string> powerUpOrder = new List<string>();
     public GameObject coinText;
+    private TMP_Text zPowerText;
+    private TMP_Text xPowerText;
+    private TMP_Text cPowerText;
 
     void Awake()
     {
@@ -27,46 +30,80 @@ public class GameSystem : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         canvas = GameObject.Find("Canvas");
         coinText = GameObject.Find("coins");
+        zPowerText = GameObject.Find("zPower")?.GetComponent<TMP_Text>();
+        xPowerText = GameObject.Find("xPower")?.GetComponent<TMP_Text>();
+        cPowerText = GameObject.Find("cPower")?.GetComponent<TMP_Text>();
+        
+        if (coinText != null)
+        {
+            coinText.GetComponent<TMP_Text>().text = coins.ToString();
+        }
+
+        takeCoins(0);
     }
 
     public int getCoins()
     {
         return coins;
-        coinText.GetComponent<TMP_Text>().text = coins.ToString();
-
     }
+
+    public void newScene()
+    {
+        Debug.Log("Jacket");
+        canvas = GameObject.Find("Canvas");
+        coinText = GameObject.Find("coins");
+        zPowerText = GameObject.Find("zPower")?.GetComponent<TMP_Text>();
+        xPowerText = GameObject.Find("xPower")?.GetComponent<TMP_Text>();
+        cPowerText = GameObject.Find("cPower")?.GetComponent<TMP_Text>();
+        if (coinText != null)
+        {
+            coinText.GetComponent<TMP_Text>().text = coins.ToString();
+            takeCoins(0);
+        }
+        else
+        {
+            Debug.LogWarning("Coin text object not found in the new scene.");
+        }
+    }
+
     public string getPowerPos(int pos)
     {
-        // Check if the position is valid
         if (pos < 0 || pos >= powerUpInventory.Count)
         {
             Debug.LogWarning("Position out of range in powerUpInventory.");
-            return null; // Return null or handle this error appropriately
+            return null;
         }
 
-        // Iterate through the dictionary keys
         int currentIndex = 0;
         foreach (var key in powerUpInventory.Keys)
         {
             if (currentIndex == pos)
             {
-                return key; // Return the power-up name at the specified position
+                return key;
             }
             currentIndex++;
         }
 
-        return null; // Fallback, should not be reached if input is valid
+        return null;
     }
+
     public void addCoin(int coinsAdd)
     {
         coins += coinsAdd;
-        coinText.GetComponent<TMP_Text>().text = coins.ToString();
+        if (coinText != null)
+        {
+            coinText.GetComponent<TMP_Text>().text = coins.ToString();
+        }
     }
 
-    public void takeCoins(int coinsTake){
+    public void takeCoins(int coinsTake)
+    {
         coins -= coinsTake;
         coinText = GameObject.Find("coins");
-        coinText.GetComponent<TMP_Text>().text = coins.ToString();
+        if (coinText != null)
+        {
+            coinText.GetComponent<TMP_Text>().text = coins.ToString();
+        }
     }
 
     public int getExtraLives()
@@ -82,8 +119,11 @@ public class GameSystem : MonoBehaviour
     public void beatLevel()
     {
         levelsBeat++;
-        sceneChanging.sceneToChange = "Shop";
-        sceneChanging.ChangeScene();
+        if (sceneChanging != null)
+        {
+            sceneChanging.sceneToChange = "Shop";
+            sceneChanging.ChangeScene();
+        }
     }
 
     public void addPowerUp(string powerUpName, int quantity = 1)
@@ -95,7 +135,9 @@ public class GameSystem : MonoBehaviour
         else
         {
             powerUpInventory[powerUpName] = quantity;
+            powerUpOrder.Add(powerUpName);
         }
+
     }
 
     public int getPowerUpQuantity(string powerUpName)
@@ -114,7 +156,6 @@ public class GameSystem : MonoBehaviour
         return 0;
     }
 
-
     public bool usePowerUp(string powerUpName)
     {
         if (powerUpInventory.ContainsKey(powerUpName) && powerUpInventory[powerUpName] > 0)
@@ -124,15 +165,20 @@ public class GameSystem : MonoBehaviour
             {
                 powerUpInventory.Remove(powerUpName);
             }
-            return true; // Indicate that the power-up was successfully used
+            return true;
         }
-        return false; // Indicate that the power-up is not available or has no quantity left
+        return false;
     }
 
-    // Start is called before the first frame update
     void Start()
     {
+        coinText = GameObject.Find("coins");
         sceneChanging = GetComponent<SceneChanger>();
+        if (coinText != null)
+        {
+            coinText.GetComponent<TMP_Text>().text = coins.ToString();
+        }
+        takeCoins(0);
     }
 
     // Update is called once per frame
@@ -144,6 +190,13 @@ public class GameSystem : MonoBehaviour
                 UnityEditor.EditorWindow.focusedWindow.maximized = !UnityEditor.EditorWindow.focusedWindow.maximized;
             }   
         #endif
-        //coinText.GetComponent<TMP_Text>().text = coins.ToString();
+        coinText = GameObject.Find("coins");
+        coinText.GetComponent<TMP_Text>().text = coins.ToString();
+        zPowerText = GameObject.Find("zPower")?.GetComponent<TMP_Text>();
+        zPowerText.text = (getPowerPos(0) + " : " + getPowerUpQuantity(getPowerPos(0)));
+        xPowerText = GameObject.Find("xPower")?.GetComponent<TMP_Text>();
+        xPowerText.text = (getPowerPos(1) + " : " + getPowerUpQuantity(getPowerPos(1)));
+        cPowerText = GameObject.Find("cPower")?.GetComponent<TMP_Text>();
+        cPowerText.text = (getPowerPos(2) + " : " + getPowerUpQuantity(getPowerPos(2)));
     }
 }

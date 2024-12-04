@@ -4,11 +4,19 @@ using UnityEngine.SceneManagement;
 public class SceneChanger : MonoBehaviour
 {
     public string sceneToChange;
-
+    private GameSystem system;
     public void ChangeScene()
     {
+        GameObject systemObj = GameObject.Find("GameSystem");
+        if(systemObj != null){
+            system = systemObj.GetComponent<GameSystem>();
+        }
         if (!string.IsNullOrEmpty(sceneToChange))
         {
+            if(systemObj != null){
+                Debug.Log("potato");
+                system.newScene();
+            }
             SceneManager.LoadScene(sceneToChange);
         }
         else

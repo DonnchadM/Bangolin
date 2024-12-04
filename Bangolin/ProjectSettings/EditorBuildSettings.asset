@@ -17,4 +17,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/nextTestLevel.unity
     guid: 7f33ab0c89f4a1a42a34b8a61be4d189
+  - enabled: 1
+    path: Assets/Scenes/bigGap.unity
+    guid: 3106c3779ff8abb4a97960e588893140
+  - enabled: 1
+    path: Assets/Scenes/climb.unity
+    guid: f7a6a15162419b347bd1f76fbeff5209
+  - enabled: 1
+    path: Assets/Scenes/descend.unity
+    guid: 09ecf665c890f2e4db23ebd1122453da
   m_configObjects: {}

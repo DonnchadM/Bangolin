@@ -40,6 +40,7 @@ public class PlayerMovement : MonoBehaviour
         animator = GetComponent<Animator>();
         GameSystem = GameObject.Find("GameSystem");
         systemScript = GameSystem.GetComponent<GameSystem>();
+        systemScript.enabled = true;
         healthScript = this.gameObject.GetComponent<playerHealth>();
     }
 
@@ -161,23 +162,63 @@ public class PlayerMovement : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawLine(transform.position, transform.position + Vector3.down * rayLength);
     }
-    private void powerUpSelect(int option){
+    private void powerUpSelect(int option)
+    {
+        Debug.Log("Option is " + option);
         string powerFound = systemScript.getPowerPos(option);
-        int quan = systemScript.getPowerUpQuantity(powerFound);
-        if (quan >= 1){
-            switch (powerFound){
+        Debug.Log("Selected power-up: " + powerFound);
+
+        if (!systemScript.powerUpInventory.ContainsKey(powerFound))
+        {
+            Debug.LogError("Power-up not found in inventory: " + powerFound);
+            return;
+        }
+
+        int quantity = systemScript.getPowerUpQuantity(powerFound);
+        Debug.Log("Power-up quantity: " + quantity);
+
+        if (quantity >= 1)
+        {
+            switch (powerFound)
+            {
                 case "Zoom":
                     Zoom();
                     break;
                 case "'NotherShell":
                     healthScript.addHit(1);
-                    Debug.Log("firstShellTest");
+                    Debug.Log("Health power-up applied.");
+                    break;
+                case "Zap":
+                    Zap();
+                    break;
+                default:
+                    Debug.LogError("Unknown power-up: " + powerFound);
                     break;
             }
+            
+            systemScript.usePowerUp(powerFound);
+        }
+        else
+        {
+            Debug.LogWarning("Not enough quantity for power-up: " + powerFound);
         }
     }
+
     private void Zoom(){
         rb.velocity = new Vector2(rb.velocity.x, 12);
-        systemScript.usePowerUp("Zoom");
     }
+
+    private void Zap()
+    {
+        
+        float teleportDistance = 5f;
+
+        
+        Vector3 teleportDirection = transform.localScale.x > 0 ? Vector3.right : Vector3.left;
+
+        transform.position += teleportDirection * teleportDistance;
+
+        Debug.Log("Zap power-up applied. Player teleported.");
+    }
+
 }
