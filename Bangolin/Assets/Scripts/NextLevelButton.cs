@@ -4,44 +4,57 @@ using UnityEngine;
 
 public class NextLevelButton : MonoBehaviour
 {
-    private GameObject gameSystem;
-    private GameSystem system;
+    private GameSystem gameSystem;
     private SceneChanger sceneChanger;
 
-    // List of level names
     public List<string> levelNames;
+    public List<string> bonusLevelNames;
 
-    // Start is called before the first frame update
     void Start()
     {
-        gameSystem = GameObject.Find("GameSystem");
-        system = gameSystem.GetComponent<GameSystem>();
+        gameSystem = FindObjectOfType<GameSystem>();
         sceneChanger = gameSystem.GetComponent<SceneChanger>();
 
-        // Example: Initialize the list of level names (or set this in the Inspector)
-        levelNames = new List<string> { "SampleScene", "nextTestLevel","bigGap","climb","descend",};
+        levelNames = new List<string> { "SampleScene", "nextTestLevel", "bigGap", "climb", "descend" };
+        bonusLevelNames = new List<string> { "Bonus1" };
     }
 
-    // Update is called once per frame
-    void Update()
+    public void NextLevel()
     {
-    }
+        Debug.Log("crap");
+        gameSystem.IncrementNextLevelButtonPressCount();
 
-    public void nextLevel()
-    {
-        if (levelNames.Count > 0)
+        int pressCount = gameSystem.GetNextLevelButtonPressCount();
+
+        if (pressCount % 3 == 0) 
         {
-            // Select a random level from the list
-            int randomIndex = Random.Range(0, levelNames.Count);
-            string randomLevel = levelNames[randomIndex];
+            if (bonusLevelNames.Count > 0)
+            {
+                int randomIndex = Random.Range(0, bonusLevelNames.Count);
+                string randomBonusLevel = bonusLevelNames[randomIndex];
 
-            // Change to the selected random level
-            sceneChanger.sceneToChange = randomLevel;
-            sceneChanger.ChangeScene();
+                sceneChanger.sceneToChange = randomBonusLevel;
+                sceneChanger.ChangeScene();
+            }
+            else
+            {
+                Debug.LogWarning("No bonus levels in the list to choose from!");
+            }
         }
-        else
+        else 
         {
-            Debug.LogWarning("No levels in the list to choose from!");
+            if (levelNames.Count > 0)
+            {
+                int randomIndex = Random.Range(0, levelNames.Count);
+                string randomLevel = levelNames[randomIndex];
+
+                sceneChanger.sceneToChange = randomLevel;
+                sceneChanger.ChangeScene();
+            }
+            else
+            {
+                Debug.LogWarning("No levels in the list to choose from!");
+            }
         }
     }
 }

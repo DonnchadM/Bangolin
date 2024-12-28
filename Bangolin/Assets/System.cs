@@ -46,7 +46,17 @@ public class GameSystem : MonoBehaviour
     {
         return coins;
     }
+    private int nextLevelButtonPressCount = 0; // Tracks the button presses
 
+    public void IncrementNextLevelButtonPressCount()
+    {
+        nextLevelButtonPressCount++;
+    }
+
+    public int GetNextLevelButtonPressCount()
+    {
+        return nextLevelButtonPressCount;
+    }
     public void newScene()
     {
         Debug.Log("Jacket");

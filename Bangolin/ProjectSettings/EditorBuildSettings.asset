@@ -26,4 +26,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/descend.unity
     guid: 09ecf665c890f2e4db23ebd1122453da
+  - enabled: 1
+    path: Assets/Scenes/Bonus1.unity
+    guid: 9b4ed61a4d934d54e8064a114a7a60bd
   m_configObjects: {}
