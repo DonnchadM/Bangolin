@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public enum PlayerState { UPRIGHT, ROLLING }
+    public enum PlayerState { UPRIGHT, ROLLING, SLIDING }
     public PlayerState currentState = PlayerState.UPRIGHT;
 
     public float moveSpeed = 5f;
@@ -13,6 +13,8 @@ public class PlayerMovement : MonoBehaviour
     public float rollingDeceleration = 5f;
     public float turnDeceleration = 20f;
     public float jumpForce = 10f;
+
+    public float slidingSpeed = 8f;
 
     public float rollingDuration = 3f;
     private float rollingTimer = 0f;
@@ -32,6 +34,7 @@ public class PlayerMovement : MonoBehaviour
     private GameObject GameSystem;
     private GameSystem systemScript;
     private playerHealth healthScript;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -46,8 +49,19 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        HandleStateSwitching();
+        if (currentState != PlayerState.SLIDING)
+        {
+            HandleStateSwitching();
+        }
+
         moveInput = Input.GetAxisRaw("Horizontal");
+
+        if (currentState == PlayerState.SLIDING)
+        {
+            spriteRenderer.sprite = ball;
+            HandleSlidingState();
+            return;
+        }
 
         float maxSpeed = (currentState == PlayerState.ROLLING) ? rollingSpeed : moveSpeed;
         float accelerationRate = (currentState == PlayerState.ROLLING) ? rollingAcceleration : acceleration;
@@ -96,20 +110,44 @@ public class PlayerMovement : MonoBehaviour
         {
             transform.localScale = new Vector3(-1, 1, 1);
         }
-        if (Input.GetKeyDown("z")){
-            powerUpSelect(0);
+    }
+
+    private void HandleSlidingState()
+    {
+        if (spriteRenderer.sprite != ball)
+        {
+            spriteRenderer.sprite = ball;
         }
-        else if(Input.GetKeyDown("x")){
-            powerUpSelect(1);
+
+        rb.velocity = new Vector2(Mathf.Sign(rb.velocity.x) * slidingSpeed, rb.velocity.y);
+
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
-        else if(Input.GetKeyDown("c")){
-            powerUpSelect(2);
+
+        isGrounded = Physics2D.Raycast(transform.position, Vector2.down, rayLength);
+        if (isGrounded && !OnIce())
+        {
+            currentState = PlayerState.UPRIGHT;
+            spriteRenderer.sprite = defaultSprite;
         }
-        
+    }
+
+    private bool OnIce()
+    {
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, rayLength);
+        return hit.collider != null && hit.collider.CompareTag("Ice");
     }
 
     private void HandleStateSwitching()
     {
+        if (OnIce())
+        {
+            currentState = PlayerState.SLIDING;
+            return;
+        }
+
         if (Input.GetKeyDown(KeyCode.LeftShift) && currentState == PlayerState.UPRIGHT && canSwitchState)
         {
             currentState = PlayerState.ROLLING;
@@ -152,16 +190,19 @@ public class PlayerMovement : MonoBehaviour
             Destroy(other.gameObject);
             systemScript.addCoin(1);
         }
-        else if (other.CompareTag("Star")){
+        else if (other.CompareTag("Star"))
+        {
             Debug.Log("Star");
             systemScript.beatLevel();
         }
     }
+
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawLine(transform.position, transform.position + Vector3.down * rayLength);
     }
+
     private void powerUpSelect(int option)
     {
         Debug.Log("Option is " + option);
@@ -186,7 +227,6 @@ public class PlayerMovement : MonoBehaviour
                     break;
                 case "'NotherShell":
                     healthScript.addHit(1);
-                    Debug.Log("Health power-up applied.");
                     break;
                 case "Zap":
                     Zap();
@@ -195,7 +235,7 @@ public class PlayerMovement : MonoBehaviour
                     Debug.LogError("Unknown power-up: " + powerFound);
                     break;
             }
-            
+
             systemScript.usePowerUp(powerFound);
         }
         else
@@ -204,21 +244,15 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    private void Zoom(){
+    private void Zoom()
+    {
         rb.velocity = new Vector2(rb.velocity.x, 12);
     }
 
     private void Zap()
     {
-        
         float teleportDistance = 5f;
-
-        
         Vector3 teleportDirection = transform.localScale.x > 0 ? Vector3.right : Vector3.left;
-
         transform.position += teleportDirection * teleportDistance;
-
-        Debug.Log("Zap power-up applied. Player teleported.");
     }
-
 }
