@@ -13,13 +13,13 @@ public class PlayerMovement : MonoBehaviour
     public float rollingDeceleration = 5f;
     public float turnDeceleration = 20f;
     public float jumpForce = 10f;
-
-    public float slidingSpeed = 8f;
-
+    public float slidingSpeed = 4f;
     public float rollingDuration = 3f;
+    public float wallJumpHeight = 6f;
+
     private float rollingTimer = 0f;
     private bool canSwitchState = true;
-
+    private bool willWallJump = false;
     public Sprite ball;
     private Sprite defaultSprite;
 
@@ -44,7 +44,7 @@ public class PlayerMovement : MonoBehaviour
         GameSystem = GameObject.Find("GameSystem");
         systemScript = GameSystem.GetComponent<GameSystem>();
         systemScript.enabled = true;
-        healthScript = this.gameObject.GetComponent<playerHealth>();
+        healthScript = GetComponent<playerHealth>();
     }
 
     void Update()
@@ -123,6 +123,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
+            willWallJump = true;
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
         }
 
@@ -130,6 +131,7 @@ public class PlayerMovement : MonoBehaviour
         if (isGrounded && !OnIce())
         {
             currentState = PlayerState.UPRIGHT;
+            willWallJump = false;
             spriteRenderer.sprite = defaultSprite;
         }
     }
@@ -137,7 +139,11 @@ public class PlayerMovement : MonoBehaviour
     private bool OnIce()
     {
         RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, rayLength);
-        return hit.collider != null && hit.collider.CompareTag("Ice");
+        if (hit.collider != null && hit.collider.CompareTag("Ice"))
+        {
+            return true;
+        }
+        return false;
     }
 
     private void HandleStateSwitching()
@@ -186,14 +192,35 @@ public class PlayerMovement : MonoBehaviour
     {
         if (other.CompareTag("Coin"))
         {
-            Debug.Log("hihihi");
             Destroy(other.gameObject);
             systemScript.addCoin(1);
         }
         else if (other.CompareTag("Star"))
         {
-            Debug.Log("Star");
             systemScript.beatLevel();
+        }
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (currentState == PlayerState.SLIDING)
+        {
+            foreach (ContactPoint2D contact in collision.contacts)
+            {
+                if (Mathf.Abs(contact.normal.x) > Mathf.Abs(contact.normal.y))
+                {
+                    rb.velocity = new Vector2(-rb.velocity.x, rb.velocity.y);
+
+                    float newScaleX = transform.localScale.x * -1;
+                    transform.localScale = new Vector3(newScaleX, transform.localScale.y, transform.localScale.z);
+                    if (willWallJump == true && !isGrounded)
+                    {
+                        rb.velocity = new Vector2(rb.velocity.x, wallJumpHeight);
+                        willWallJump = false;
+                        break;
+                    }
+                }
+            }
         }
     }
 
@@ -205,18 +232,14 @@ public class PlayerMovement : MonoBehaviour
 
     private void powerUpSelect(int option)
     {
-        Debug.Log("Option is " + option);
         string powerFound = systemScript.getPowerPos(option);
-        Debug.Log("Selected power-up: " + powerFound);
 
         if (!systemScript.powerUpInventory.ContainsKey(powerFound))
         {
-            Debug.LogError("Power-up not found in inventory: " + powerFound);
             return;
         }
 
         int quantity = systemScript.getPowerUpQuantity(powerFound);
-        Debug.Log("Power-up quantity: " + quantity);
 
         if (quantity >= 1)
         {
@@ -231,16 +254,9 @@ public class PlayerMovement : MonoBehaviour
                 case "Zap":
                     Zap();
                     break;
-                default:
-                    Debug.LogError("Unknown power-up: " + powerFound);
-                    break;
             }
 
             systemScript.usePowerUp(powerFound);
-        }
-        else
-        {
-            Debug.LogWarning("Not enough quantity for power-up: " + powerFound);
         }
     }
 

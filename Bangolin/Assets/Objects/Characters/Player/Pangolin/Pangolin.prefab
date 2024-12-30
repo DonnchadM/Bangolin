@@ -167,7 +167,9 @@ MonoBehaviour:
   rollingDeceleration: 3
   turnDeceleration: 20
   jumpForce: 5
+  slidingSpeed: 6
   rollingDuration: 3
+  wallJumpHeight: 6
   ball: {fileID: 1560260298288015655, guid: d32b5089329ffd74aaceeb7c51f2cdfb, type: 3}
   rayLength: 0.1
 --- !u!95 &1600286177642511099
