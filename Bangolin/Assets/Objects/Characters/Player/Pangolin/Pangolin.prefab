@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 1600286177642511099}
   - component: {fileID: -1860543603647421461}
   - component: {fileID: -7694558577158732650}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Pangolin
   m_TagString: Player
   m_Icon: {fileID: 0}

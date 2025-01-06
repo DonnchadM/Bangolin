@@ -14,7 +14,6 @@ public class SceneChanger : MonoBehaviour
         if (!string.IsNullOrEmpty(sceneToChange))
         {
             if(systemObj != null){
-                Debug.Log("potato");
                 system.newScene();
             }
             SceneManager.LoadScene(sceneToChange);

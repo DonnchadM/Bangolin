@@ -34,7 +34,6 @@ public class playerHealth : MonoBehaviour
     }
     IEnumerator StartGhostTime(){
         yield return new WaitForSeconds(ghostTime);
-        Debug.Log("SWAGSWAGSWAG");
         invincible = false;
         Debug.Log(invincible);
     }
@@ -46,7 +45,6 @@ public class playerHealth : MonoBehaviour
         }
     }
     void Die(){
-        Debug.Log("IMDEAD");
         Destroy(this.gameObject);
     }
 }
